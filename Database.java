@@ -13,54 +13,83 @@ public class Database{
     private Scanner dbReader;
     private final Random random = new Random();
 
-    // Constructor
     public Database(String dbPath) {
         this.dataBasePath = dbPath;
+        main.log.appendInfo("Database path setted to " + this.getDataBasePath() + ".");
+
         loadDatabase(dataBasePath);
     }
 
     // Database loader
     public void loadDatabase(String name) {
+        main.log.appendInfo("Loading database.");
+
         // Check if the database path is null/blank/empty
-        if (this.dataBasePath == null || this.dataBasePath.isEmpty() || this.dataBasePath.isBlank() || name==null || name.isBlank()) {
+        if (this.dataBasePath == null || this.dataBasePath.isEmpty() || name==null || name.isEmpty()) {
+            main.log.appendWarn("Database path is null/empty, setting to default.");
+
             // Set the db path to "jsonDB" (default name)
             setDataBasePath("jsonDB");
+
             // Load the db with the path assigned
+            main.log.appendInfo("Re-loading database.");
             loadDatabase(this.dataBasePath);
+
         } else {
             // Creates a temp File object with the db
             File myJsonDB = new File(this.dataBasePath);
+
             // Check if it exists
             if (myJsonDB.exists()) {
                 // Set the db file object from the temp File
                 this.jsonDB = myJsonDB;
+
                 try {
                     // Creates a StringBuilder object to store the lines of the file
                     StringBuilder dbContent = new StringBuilder();
+
                     // Creates the Scanner object and assign to the variable dbReader
+                    main.log.appendInfo("Initializing scanner.");
                     this.dbReader = new Scanner(jsonDB);
+                    main.log.appendInfo("Scanner initialized successfully.");
+
                     // Start reading the file until EOF (end of file)
+                    main.log.appendInfo("Reading database content.");
                     while (dbReader.hasNextLine()) {
                         // Every line is added to the string builder "dbContent"
                         dbContent.append(dbReader.nextLine()).append("\n");
                     }
+
                     // Close the stream
+                    main.log.appendInfo("Closing scanner.");
                     dbReader.close();
+                    main.log.appendInfo("Scanner closed successfully.");
+
                     // Creates the FileWriter object and assign to the variable dbWriter
+                    main.log.appendInfo("Initializing FileWriter.");
                     this.dbWriter = new FileWriter(jsonDB);
+                    main.log.appendInfo("FileWriter initialized successfully.");
+
                     // Write every line collected by the String builder
+                    main.log.appendInfo("Re-writing database content.");
                     dbWriter.write(dbContent.toString());
+
                     // Close the stream
+                    main.log.appendInfo("Closing FileWriter.");
                     dbWriter.close();
-                    // Catches an error if happens
+                    main.log.appendInfo("FileWriter closed successfully.");
+
                 } catch (Exception err) {
                     // Print the error in the log
                     main.log.appendErr("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
                 }
+
             } else {
+                main.log.appendWarn("Database not found.");
                 createDatabase(this.dataBasePath);
             }
         }
+        main.log.appendInfo("Loaded database successfully.");
     }
 
     // Create database method
@@ -75,7 +104,7 @@ public class Database{
             } else {
                 // If it already exists
                 // It print a warn message
-                main.log.appendWarn("That json database already exist");
+                main.log.appendWarn("A database with that name already exist");
                 // It tries to make another one with the original name + the random number
                 createDatabase(name + random.nextInt(0,10000));
             }
@@ -91,7 +120,7 @@ public class Database{
         // Create a string
         String currentLine = "";
         try {
-            // Reinitialize the scanner
+            // Re initialize scanner
             this.dbReader = new Scanner(jsonDB);
             // Loop until end  of file (EOF)
             while (dbReader.hasNext()) {
@@ -126,7 +155,7 @@ public class Database{
         // Creates an HashMap obj
         HashMap<String, String> parameters = new HashMap<>();
         try {
-            // Re-initialize the scanner
+            // Re initialize scanner
             this.dbReader = new Scanner(jsonDB);
             while (dbReader.hasNext()) {
                 // Read line in the file
@@ -166,10 +195,40 @@ public class Database{
         return parameters;
     }
     public void addElement(String name) {
-        if (getElement(name)!=null) {
-            String newName = name + random.nextInt(0,10000);
-            addElement(newName);
+        // Check if the element is already present
+        if (getElement(name)!=null) { // TO FIX
+            main.log.appendWarn("Element already in database. Skipping method");
+        } else {
+            try {
+                // Creates a StringBuilder object to store the lines of the file
+                StringBuilder dbContent = new StringBuilder();
+                // Re-initialize scanner
+                this.dbReader = new Scanner(jsonDB);
+                // Start reading the file until EOF (end of file)
+                while (dbReader.hasNextLine()) {
+                    String line = dbReader.nextLine();
+                    if (line.equals("}")) {
+                        break;
+                    }
+                    // Every line is added to the string builder "dbContent"
+                    dbContent.append(line).append("\n");
+                }
+                // Close the stream
+                dbReader.close();
+                // Re-initialize the writer
+                this.dbWriter = new FileWriter(jsonDB);
+                // Write the content
+                dbWriter.write(dbContent.toString());
+                dbWriter.write("\t\"" + name + "\"");
+                // Write the end of the file with "}"
+                dbWriter.write("\n}");
+                // Close the stream
+                dbWriter.close();
+                // Catches an error if happens
+            } catch (Exception err) {
+                // Print the error in the log
+                main.log.appendErr("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
+            }
         }
-
     }
 }
