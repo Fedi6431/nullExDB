@@ -14,6 +14,7 @@ public class Database{
     private final Random random = new Random();
 
     // 👍
+    // Constructor
     public Database(String dbPath) {
         this.dataBasePath = dbPath;
         main.log.appendInfo("Database path setted to " + this.getDataBasePath() + ".");
@@ -156,18 +157,30 @@ public class Database{
         return currentLine;
     }
 
-    // TO FINISH
-    public String[] getElements() {
+    // 👍
+    // Get elements method
+    public ArrayList<String> getElements() {
         // Create a string
-        String currentLine = "";
+        String currentLine;
+        ArrayList<String> elements = new ArrayList<>();
         try {
             // Re initialize scanner
+            main.log.appendInfo("Initializing scanner.");
             this.dbReader = new Scanner(jsonDB);
+            main.log.appendInfo("Scanner initialized successfully.");
+
             // Loop until end  of file (EOF)
             while (dbReader.hasNext()) {
                 // Read line
                 currentLine = dbReader.nextLine();
+                if (!(currentLine.equals("{") || currentLine.equals("}"))) {
+                    currentLine = currentLine.replace(" ", "")
+                            .replace("\t","")
+                            .replace("\"","");
 
+                    String[] tempArr = currentLine.split(":");
+                    elements.add(tempArr[0]);
+                }
             }
             // Close the streams
             main.log.appendInfo("Closing scanner.");
@@ -178,7 +191,64 @@ public class Database{
             // Print the error in the log
             main.log.appendErr("An error occurred the session: " + err.getMessage() + "\n Cause: " + err.getCause());
         }
-        return null;
+        return elements;
+    }
+
+    // 👍
+    // add element method
+    public void addElement(String name) {
+        // Check if the element is already present
+        if (getElement(name)!=null) { // TO FIX
+            main.log.appendWarn("Element already in database. Skipping method");
+
+        } else {
+
+            try {
+                // Creates a StringBuilder object to store the lines of the file
+                StringBuilder dbContent = new StringBuilder();
+
+                // Re-initialize scanner
+                main.log.appendInfo("Initializing scanner.");
+                this.dbReader = new Scanner(jsonDB);
+                main.log.appendInfo("Scanner initialized successfully.");
+
+                // Start reading the file until EOF (end of file)
+                while (dbReader.hasNextLine()) {
+
+                    String line = dbReader.nextLine();
+                    if (line.equals("}")) {
+                        break;
+                    }
+
+                    // Every line is added to the string builder "dbContent"
+                    dbContent.append(line).append("\n");
+                }
+                // Close the stream
+                main.log.appendInfo("Closing scanner.");
+                dbReader.close();
+                main.log.appendInfo("Scanner closed successfully.");
+
+                // Re-initialize the writer
+                main.log.appendInfo("Initializing FileWriter.");
+                this.dbWriter = new FileWriter(jsonDB);
+                main.log.appendInfo("FileWriter initialized successfully.");
+
+                // Write the content
+                dbWriter.write(dbContent.toString());
+                dbWriter.write("\t\"" + name + "\"");
+                // Write the end of the file with "}"
+                dbWriter.write("\n}");
+
+                // Close the stream
+                main.log.appendInfo("Closing FileWriter.");
+                dbWriter.close();
+                main.log.appendInfo("FileWriter closed successfully.");
+
+            } catch (Exception err) {
+                // Print the error in the log
+                main.log.appendErr("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
+            }
+        }
     }
 
     // 👍
@@ -243,61 +313,9 @@ public class Database{
         return parameters;
     }
 
-
-    // 👍
-    // add element method
-    public void addElement(String name) {
-        // Check if the element is already present
-        if (getElement(name)!=null) { // TO FIX
-            main.log.appendWarn("Element already in database. Skipping method");
-
-        } else {
-
-            try {
-                // Creates a StringBuilder object to store the lines of the file
-                StringBuilder dbContent = new StringBuilder();
-
-                // Re-initialize scanner
-                main.log.appendInfo("Initializing scanner.");
-                this.dbReader = new Scanner(jsonDB);
-                main.log.appendInfo("Scanner initialized successfully.");
-
-                // Start reading the file until EOF (end of file)
-                while (dbReader.hasNextLine()) {
-
-                    String line = dbReader.nextLine();
-                    if (line.equals("}")) {
-                        break;
-                    }
-
-                    // Every line is added to the string builder "dbContent"
-                    dbContent.append(line).append("\n");
-                }
-                // Close the stream
-                main.log.appendInfo("Closing scanner.");
-                dbReader.close();
-                main.log.appendInfo("Scanner closed successfully.");
-
-                // Re-initialize the writer
-                main.log.appendInfo("Initializing FileWriter.");
-                this.dbWriter = new FileWriter(jsonDB);
-                main.log.appendInfo("FileWriter initialized successfully.");
-
-                // Write the content
-                dbWriter.write(dbContent.toString());
-                dbWriter.write("\t\"" + name + "\"");
-                // Write the end of the file with "}"
-                dbWriter.write("\n}");
-
-                // Close the stream
-                main.log.appendInfo("Closing FileWriter.");
-                dbWriter.close();
-                main.log.appendInfo("FileWriter closed successfully.");
-
-            } catch (Exception err) {
-                // Print the error in the log
-                main.log.appendErr("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
-            }
-        }
+    // Get value method
+    public String getAttribute(String elementName, String key) {
+        return null;
     }
+
 }
