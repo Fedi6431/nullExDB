@@ -221,27 +221,33 @@ public class Database{
 
     // Edit element method
     public void editElement(String oldElement, String newElement) {
-        // Create a string
-        String currentLine;
-        // Re initialize scanner
-        loadScanner();
-        // Loop until end  of file (EOF)
-        while (dbReader.hasNext()) {
-            // Read line
-            currentLine = dbReader.nextLine();
-            // If the like has the element
-            if (currentLine.contains(oldElement)) {
-                // It removes the spaces
-                currentLine = currentLine.replace(" ", "");
-                // Take the element name
-                currentLine = currentLine.substring(1, oldElement.length()+1);
-                break;
-            } else {
-                currentLine = null;
+        try {
+            // Creates a StringBuilder object to store the lines of the file
+            StringBuilder dbContent = new StringBuilder();
+            // Re-initialize scanner
+            loadScanner();
+            // Start reading the file until EOF (end of file)
+            while (dbReader.hasNextLine()) {
+                String line = dbReader.nextLine();
+                // Every line is added to the string builder "dbContent"
+                dbContent.append(line).append("\n");
             }
+            // Close the stream
+            unloadScanner();
+            // Calculation to calculate element position
+            int oldElementIndexPosition = dbContent.indexOf(oldElement);
+            int elementLength = getElement(oldElement).length();
+            // Re place the old element with the new one
+            dbContent.replace(oldElementIndexPosition, (oldElementIndexPosition+elementLength), newElement);
+            // Re-initialize writer
+            loadWriter();
+            dbWriter.write(dbContent.toString());
+            // Unload the writer
+            unloadWriter();
+        } catch (Exception err) {
+            // Print the error in the log
+            main.log.appendErr("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
         }
-        // Close the streams
-        unloadScanner();
     }
 
     // Get parameters method
