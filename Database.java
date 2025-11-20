@@ -49,45 +49,40 @@ public class Database{
     }
 
     // Database loader
+    @SuppressWarnings("All")
     public void loadDatabase(String name) {
         // Check if the database path is null/blank/empty
         if (this.dataBasePath == null || this.dataBasePath.isEmpty() || name==null || name.isEmpty()) {
-            // Set the db path to "jsonDB" (default name)
-            setDataBasePath("jsonDB");
-            // Load the db with the path assigned
-            loadDatabase(this.dataBasePath);
-        } else {
-            // Creates a temp File object with the db
-            File myJsonDB = new File(name);
-            // Check if it exists
-            if (myJsonDB.exists()) {
-                // Set the db file object from the temp File
-                this.jsonDB = myJsonDB;
-                try {
-                    // Creates a StringBuilder object to store the lines of the file
-                    StringBuilder dbContent = new StringBuilder();
-                    // Load the scanner
-                    loadScanner();
-                    // Start reading the file until EOF (end of file)
-                    while (dbReader.hasNextLine()) {
-                        // Every line is added to the string builder "dbContent"
-                        dbContent.append(dbReader.nextLine()).append("\n");
-                    }
-                    // Close the stream
-                    unloadScanner();
-                    // Creates the FileWriter object and assign to the variable dbWriter
-                    loadWriter();
-                    // Write every line collected by the String builder
-                    dbWriter.write(dbContent.toString());
-                    // Close the stream
-                    unloadWriter();
-                } catch (Exception err) {
-                    // Print the error in the log
-                    System.out.println("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
-                }
-            } else {
-                createDatabase(this.dataBasePath);
+            setDataBasePath("jsonDB"); // Set the db path to "jsonDB" (default name)
+            loadDatabase(this.dataBasePath); // Load the db with the path assigned
+            return;
+        }
+        // Creates a temp File object with the db
+        File myJsonDB = new File(name);
+        if (myJsonDB.exists()) {
+            // Set the db file object from the temp File
+            this.jsonDB = myJsonDB;
+            // Creates a StringBuilder object to store the lines of the file
+            StringBuilder dbContent = new StringBuilder();
+            loadScanner(); // Load the scanner
+            // Start reading the file until EOF (end of file)
+            while (dbReader.hasNextLine()) {
+                // Every line is added to the string builder "dbContent"
+                dbContent.append(dbReader.nextLine()).append("\n");
             }
+            unloadScanner(); // Close the stream
+            loadWriter(); // Load the writer
+            // Write every line collected by the String builder
+            try {
+                dbWriter.write(dbContent.toString());
+                // Close the stream
+                unloadWriter();
+            } catch (Exception err) {
+                // Print the error in the log
+                System.out.println("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
+            }
+        } else {
+            createDatabase(this.dataBasePath);
         }
     }
 
@@ -110,19 +105,15 @@ public class Database{
 
     // Get elements method
     public ArrayList<String> getElements() {
-        // Create a string
-        String currentLine;
         ArrayList<String> elements = new ArrayList<>();
-        // Re initialize scanner
-        loadScanner();
+        loadScanner(); // Re initialize scanner
         // Loop until end  of file (EOF)
         while (dbReader.hasNext()) {
             // Read line
+            String currentLine;
             currentLine = dbReader.nextLine();
             if (!(currentLine.equals("{") || currentLine.equals("}"))) {
-                currentLine = currentLine.replace(" ", "")
-                        .replace("\t","")
-                        .replace("\"","");
+                currentLine = currentLine.replaceAll("[ \\t\"]", "");
                 String[] tempArr = currentLine.split(":");
                 elements.add(tempArr[0]);
             }
@@ -134,37 +125,19 @@ public class Database{
 
     // Get element method
     public String getElement(String elementName) {
-        // Create a string
-        String currentLine = "";
-        // Re initialize scanner
-        loadScanner();
-        // Loop until end  of file (EOF)
-        while (dbReader.hasNext()) {
-            // Read line
-            currentLine = dbReader.nextLine();
-            // If the like has the element
-            if (currentLine.contains(elementName)) {
-                // It removes the spaces
-                currentLine = currentLine.replace(" ", "");
-                // Take the element name
-                currentLine = currentLine.substring(1, elementName.length()+1);
-                break;
-            } else {
-                currentLine = null;
-            }
+        ArrayList<String> elements = getElements();
+        int indexOfElement = elements.indexOf(elementName);
+        if (!(indexOfElement<0)) {
+            return elements.get(indexOfElement);
+        } else {
+            return null;
         }
-        // Close the streams
-        unloadScanner();
-        return currentLine;
     }
 
     // add element method
     public void addElement(String name) {
         // Check if the element is already present
-        if (getElement(name)!=null) { // TO FIX
-            System.out.println();
-
-        } else {
+        if (getElement(name)==null) {
             try {
                 // Creates a StringBuilder object to store the lines of the file
                 StringBuilder dbContent = new StringBuilder();
@@ -230,14 +203,13 @@ public class Database{
 
     // Get parameters method
     public HashMap<String, String> getAttributes(String elementName) {
-        // Creates a string
-        String currentLine;
         // Creates an HashMap obj
         HashMap<String, String> parameters = new HashMap<>();
         // Re initialize scanner
         loadScanner();
         while (dbReader.hasNext()) {
             // Read line in the file
+            String currentLine;
             currentLine = dbReader.nextLine();
             // If contains the element name
             if (currentLine.contains(elementName)) {
@@ -270,7 +242,8 @@ public class Database{
 
     // Get value method
     public String getAttribute(String elementName, String key) {
-        return null;
+        HashMap<String, String> attributes = getAttributes(elementName);
+        return attributes.get(key);
     }
 
     // Add attribute method
