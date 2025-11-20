@@ -286,6 +286,7 @@ public class Database{
         return attributes.get(key);
     }
 
+    // TO FIX
     // Add attribute method
     public void addAttribute(String elementName, String key, String parameter) {
         StringBuilder dbContent = new StringBuilder();
@@ -324,15 +325,14 @@ public class Database{
             unloadWriter();
         }
     }
+    
     // Edit attribute method
     public void editAttribute() {}
 
     public void removeAttribute() {}
 
     // Add attribute method
-    public void addParameter(String elementName, String key, String parameter) {
-
-    }
+    public void addParameter(String elementName, String key, String parameter) {}
     // Edit attribute method
     public void editParameter() {}
 
