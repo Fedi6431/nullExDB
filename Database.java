@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.*;
 
 public class Database{
-    private final Main main = new Main();
     private String dataBasePath;
     public void setDataBasePath(String path) {this.dataBasePath = path;}
     public String getDataBasePath() {return dataBasePath;}
@@ -16,58 +15,46 @@ public class Database{
 
     private void loadScanner()  {
         try {
-            main.log.appendInfo("Initializing scanner.");
             this.dbReader = new Scanner(jsonDB);
-            main.log.appendInfo("Scanner initialized successfully.");
-        }   catch (Exception err) {
-            main.log.appendErr("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
+        }   catch (IOException err) {
+            throw new RuntimeException(err);
         }
     }
 
     private void unloadScanner() {
-        main.log.appendInfo("Closing scanner.");
         dbReader.close();
-        main.log.appendInfo("Scanner closed successfully.");
     }
 
     private void loadWriter() {
         try {
-            main.log.appendInfo("Initializing FileWriter.");
             this.dbWriter = new FileWriter(jsonDB);
-            main.log.appendInfo("FileWriter initialized successfully.");
-        } catch (Exception err) {
-            main.log.appendErr("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
+        } catch (IOException err) {
+            throw new RuntimeException(err);
         }
     }
 
     private void unloadWriter() {
         try {
-            main.log.appendInfo("Closing FileWriter.");
             dbWriter.close();
-            main.log.appendInfo("FileWriter closed successfully.");
-        } catch (Exception err) {
-            main.log.appendErr("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
+        } catch (IOException err) {
+            throw new RuntimeException(err);
         }
+
     }
 
     // Constructor
     public Database(String dbPath) {
         this.dataBasePath = dbPath;
-        main.log.appendInfo("Database path setted to " + this.getDataBasePath() + ".");
-
         loadDatabase(dataBasePath);
     }
 
     // Database loader
     public void loadDatabase(String name) {
-        main.log.appendInfo("Loading database.");
         // Check if the database path is null/blank/empty
         if (this.dataBasePath == null || this.dataBasePath.isEmpty() || name==null || name.isEmpty()) {
-            main.log.appendWarn("Database path is null/empty, setting to default.");
             // Set the db path to "jsonDB" (default name)
             setDataBasePath("jsonDB");
             // Load the db with the path assigned
-            main.log.appendInfo("Re-loading database.");
             loadDatabase(this.dataBasePath);
         } else {
             // Creates a temp File object with the db
@@ -82,7 +69,6 @@ public class Database{
                     // Load the scanner
                     loadScanner();
                     // Start reading the file until EOF (end of file)
-                    main.log.appendInfo("Reading database content.");
                     while (dbReader.hasNextLine()) {
                         // Every line is added to the string builder "dbContent"
                         dbContent.append(dbReader.nextLine()).append("\n");
@@ -92,20 +78,17 @@ public class Database{
                     // Creates the FileWriter object and assign to the variable dbWriter
                     loadWriter();
                     // Write every line collected by the String builder
-                    main.log.appendInfo("Re-writing database content.");
                     dbWriter.write(dbContent.toString());
                     // Close the stream
                     unloadWriter();
                 } catch (Exception err) {
                     // Print the error in the log
-                    main.log.appendErr("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
+                    System.out.println("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
                 }
             } else {
-                main.log.appendWarn("Database not found.");
                 createDatabase(this.dataBasePath);
             }
         }
-        main.log.appendInfo("Loaded database successfully.");
     }
 
     // Create database method
@@ -114,19 +97,14 @@ public class Database{
             // Creates a file with the name selected
             File file = new File(name);
             // Check if the file is created successfully
-            if (file.createNewFile()) {
-                // Print the message
-                main.log.appendInfo("Created new json database file");
-            } else {
+            if (!file.createNewFile()) {
                 // If it already exists
-                // It print a warn message
-                main.log.appendWarn("A database with that name already exist");
                 // It tries to make another one with the original name + the random number
                 createDatabase(name + random.nextInt(0,10000));
             }
         } catch (Exception err) {
             // Print the error in the log
-            main.log.appendErr("An error occurred the session: " + err.getMessage() + "\n Cause: " + err.getCause());
+            System.out.println("An error occurred the session: " + err.getMessage() + "\n Cause: " + err.getCause());
         }
     }
 
@@ -184,7 +162,7 @@ public class Database{
     public void addElement(String name) {
         // Check if the element is already present
         if (getElement(name)!=null) { // TO FIX
-            main.log.appendWarn("Element already in database. Skipping method");
+            System.out.println();
 
         } else {
             try {
@@ -214,7 +192,7 @@ public class Database{
                 unloadWriter();
             } catch (Exception err) {
                 // Print the error in the log
-                main.log.appendErr("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
+                System.out.println("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
             }
         }
     }
@@ -246,7 +224,7 @@ public class Database{
             unloadWriter();
         } catch (Exception err) {
             // Print the error in the log
-            main.log.appendErr("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
+            System.out.println("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
         }
     }
 
@@ -287,7 +265,6 @@ public class Database{
         }
         // Close the streams
         unloadScanner();
-
         return parameters;
     }
 
