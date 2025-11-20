@@ -287,9 +287,55 @@ public class Database{
     }
 
     // Add attribute method
-    public void addAttribute() {}
+    public void addAttribute(String elementName, String key, String parameter) {
+        StringBuilder dbContent = new StringBuilder();
+        boolean isInElement = getAttribute(elementName,key).equals("1");
+        loadScanner(); // Re initialize scanner
+        // Loop until end  of file (EOF)
+        while (dbReader.hasNext()) {
+            // Read line
+            String currentLine = dbReader.nextLine();
+            if (!(isInElement)) {
+                if (currentLine.contains(elementName)) {
+                    String tempLine = currentLine
+                            .replace("\t","")
+                            .replace("\"","")
+                            .replace(" ","")
+                            .substring(0,elementName.length());
+                    if (tempLine.equals(elementName)) {
+                        currentLine = currentLine + ":[\"" + key + "\":\"" + parameter + "\"]";
+                    }
+                }
+            }
 
+            dbContent.append(currentLine).append("\n");
+        }
+        // Close the streams
+        unloadScanner();
+        // Load writer
+        loadWriter();
+        try {
+            // Write the content
+            dbWriter.write(dbContent.toString());
+        } catch (Exception err) {
+            // Print the error in the log
+            System.out.println("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
+        } finally {
+            unloadWriter();
+        }
+    }
     // Edit attribute method
     public void editAttribute() {}
+
+    public void removeAttribute() {}
+
+    // Add attribute method
+    public void addParameter(String elementName, String key, String parameter) {
+
+    }
+    // Edit attribute method
+    public void editParameter() {}
+
+    public void removeParameter() {}
 
 }
