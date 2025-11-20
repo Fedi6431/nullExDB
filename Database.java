@@ -138,35 +138,36 @@ public class Database{
     public void addElement(String name) {
         // Check if the element is already present
         if (getElement(name)==null) {
-            try {
-                // Creates a StringBuilder object to store the lines of the file
-                StringBuilder dbContent = new StringBuilder();
-                // Re-initialize scanner
-                loadScanner();
-                // Start reading the file until EOF (end of file)
-                while (dbReader.hasNextLine()) {
-                    String line = dbReader.nextLine();
-                    if (line.equals("}")) {
-                        break;
-                    }
-                    // Every line is added to the string builder "dbContent"
-                    dbContent.append(line).append("\n");
+
+            // Creates a StringBuilder object to store the lines of the file
+            StringBuilder dbContent = new StringBuilder();
+            // Re-initialize scanner
+            loadScanner();
+            // Start reading the file until EOF (end of file)
+            while (dbReader.hasNextLine()) {
+                String line = dbReader.nextLine();
+                if (line.equals("}")) {
+                    break;
                 }
-                // Close the stream
-                unloadScanner();
-                // Re-initialize the writer
-                loadWriter();
+                // Every line is added to the string builder "dbContent"
+                dbContent.append(line).append("\n");
+            }
+            // Close the stream
+            unloadScanner();
+            // Re-initialize the writer
+            loadWriter();
+            try {
                 // Write the content
                 dbWriter.write(dbContent.toString());
                 dbWriter.write("\t\"" + name + "\"");
                 // Write the end of the file with "}"
                 dbWriter.write("\n}");
-                // Close the stream
-                unloadWriter();
             } catch (Exception err) {
                 // Print the error in the log
                 System.out.println("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
             }
+            // Close the stream
+            unloadWriter();
         }
     }
 
@@ -198,6 +199,45 @@ public class Database{
         } catch (Exception err) {
             // Print the error in the log
             System.out.println("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
+        }
+    }
+
+    // Remove element method
+    public void removeElement(String name) {
+        StringBuilder dbContent = new StringBuilder();
+        loadScanner(); // Re initialize scanner
+        // Loop until end  of file (EOF)
+        while (dbReader.hasNext()) {
+            // Read line
+            String currentLine = dbReader.nextLine();
+
+            if (currentLine.contains(name)) {
+                String actualName = currentLine
+                        .replace("\t","")
+                        .replace("\"","")
+                        .substring(0,name.length());
+
+                String tempLine = currentLine
+                        .replace("\t","")
+                        .replace("\"","");
+                if (tempLine.equals(actualName)) {
+                    continue;
+                }
+            }
+            dbContent.append(currentLine).append("\n");
+        }
+        // Close the streams
+        unloadScanner();
+        // Re-initialize the writer
+        loadWriter();
+        try {
+            // Write the content
+            dbWriter.write(dbContent.toString());
+        } catch (Exception err) {
+            // Print the error in the log
+            System.out.println("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
+        } finally {
+            unloadWriter();
         }
     }
 
