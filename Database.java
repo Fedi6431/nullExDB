@@ -6,7 +6,6 @@ import java.util.*;
 public class Database{
     private String dataBasePath;
     public void setDataBasePath(String path) {this.dataBasePath = path;}
-    public String getDataBasePath() {return dataBasePath;}
     private File jsonDB;
     private FileWriter dbWriter;
     private Scanner dbReader;
@@ -325,14 +324,45 @@ public class Database{
             unloadWriter();
         }
     }
-    
+
+    // TO FIX
     // Edit attribute method
-    public void editAttribute() {}
+    public void editAttribute(String elementName, String oldKey, String newKey) {
+        try {
+            // Creates a StringBuilder object to store the lines of the file
+            StringBuilder dbContent = new StringBuilder();
+            // Re-initialize scanner
+            loadScanner();
+            // Start reading the file until EOF (end of file)
+            while (dbReader.hasNextLine()) {
+                String line = dbReader.nextLine();
+                // Every line is added to the string builder "dbContent"
+                dbContent.append(line).append("\n");
+            }
+
+            // Close the stream
+            unloadScanner();
+            // Calculation to calculate element position
+            int oldElementIndexPosition = dbContent.indexOf(oldKey);
+            int elementLength = oldKey.length();
+            // Re place the old element with the new one
+            dbContent.replace(oldElementIndexPosition, (oldElementIndexPosition+elementLength), newKey);
+            // Re-initialize writer
+            loadWriter();
+            dbWriter.write(dbContent.toString());
+            // Unload the writer
+            unloadWriter();
+        } catch (Exception err) {
+            // Print the error in the log
+            System.out.println("An error occurred in the session: " + err.getMessage() + "\n Cause: " + err.getCause());
+        }
+    }
 
     public void removeAttribute() {}
 
     // Add attribute method
     public void addParameter(String elementName, String key, String parameter) {}
+
     // Edit attribute method
     public void editParameter() {}
 
