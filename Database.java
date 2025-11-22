@@ -16,16 +16,16 @@ class Database {
     }
     // Database writer variable & methods
     private FileWriter dbWriter;
-    private void loadWriter() throws IOException{
-        dbWriter = new FileWriter(db);
+    private void loadWriter(File database) throws IOException{
+        dbWriter = new FileWriter(database);
     }
     private void unloadWriter() throws IOException {
         dbWriter.close();
     }
     // Database reader variable & methods
     private Scanner dbReader;
-    private void loadScanner() throws FileNotFoundException{
-        dbReader = new Scanner(db);
+    private void loadScanner(File database) throws FileNotFoundException{
+        dbReader = new Scanner(database);
     }
     private void unloadScanner() throws FileNotFoundException {
         dbReader.close();
@@ -75,7 +75,7 @@ class Database {
     public StringBuilder readDatabase() throws IOException {
         StringBuilder tempStrBuildr;
         if (db.exists()) {
-            loadScanner();
+            loadScanner(db);
             while (dbReader.hasNextLine()) {
                 content.append(dbReader.nextLine()).append("\n");
             }
@@ -90,7 +90,7 @@ class Database {
         File file = new File(name);
         StringBuilder tempStrBuildr;
         if (file.exists()) {
-            loadScanner();
+            loadScanner(db);
             while (dbReader.hasNextLine()) {
                 content.append(dbReader.nextLine()).append("\n");
             }
@@ -104,7 +104,7 @@ class Database {
     public StringBuilder readDatabase(File file) throws IOException {
         StringBuilder tempStrBuildr;
         if (file.exists()) {
-            loadScanner();
+            loadScanner(db);
             while (dbReader.hasNextLine()) {
                 content.append(dbReader.nextLine()).append("\n");
             }
@@ -117,8 +117,39 @@ class Database {
     }
 
     // Update database method
-    public void updateDatabase(File oldDatabase, File newDatabase) {}
-    public void updateDatabase(String oldDatabase, String newDatabase) {}
+    public void updateDatabase(File oldDatabase, File newDatabase) throws IOException{
+        loadScanner(oldDatabase);
+        if (oldDatabase.exists() && newDatabase.exists()) {
+            while (dbReader.hasNextLine()) {
+                content.append(dbReader.nextLine()).append("\n");
+            }
+            unloadScanner();
+            loadWriter(newDatabase);
+            dbWriter.write(content.toString());
+            unloadWriter();
+            clearContent();
+        } else {
+            throw new FileNotFoundException();
+        }
+
+    }
+    public void updateDatabase(String oldDatabase, String newDatabase) throws IOException {
+        File oldDbFile = new File(oldDatabase);
+        File newDbFile = new File(newDatabase);
+        loadScanner(oldDbFile);
+        if (oldDbFile.exists() && newDbFile.exists()) {
+            while (dbReader.hasNextLine()) {
+                content.append(dbReader.nextLine()).append("\n");
+            }
+            unloadScanner();
+            loadWriter(newDbFile);
+            dbWriter.write(content.toString());
+            unloadWriter();
+            clearContent();
+        } else {
+            throw new FileNotFoundException();
+        }
+    }
 
     // Delete database method
     public boolean deleteDatabase() {
