@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.Scanner;
 
+// CRUD => Create, Read, Update, Delete
 @SuppressWarnings("unused")
 class Database {
     // Database file variable
@@ -47,6 +48,13 @@ class Database {
     }
 
     // Create database method
+    public void createDatabase() throws IOException {
+        if (db.createNewFile()) {
+            setDatabase(db);
+        } else {
+            throw new FileAlreadyExistsException(db.getName());
+        }
+    }
     public void createDatabase(String name) throws IOException {
         File file = new File(name);
         if (file.createNewFile()) {
@@ -55,14 +63,29 @@ class Database {
             throw new FileAlreadyExistsException(file.getName());
         }
     }
-    public void createDatabase() throws IOException {
-        if (db.createNewFile()) {
-            setDatabase(db);
+    public void createDatabase(File file) throws IOException {
+        if (file.createNewFile()) {
+            setDatabase(file);
         } else {
-            throw new FileAlreadyExistsException(db.getName());
+            throw new FileAlreadyExistsException(file.getName());
         }
     }
 
+    // Read database method
+    public StringBuilder readDatabase() throws IOException {
+        StringBuilder tempStrBuildr;
+        if (db.exists()) {
+            loadScanner();
+            while (dbReader.hasNextLine()) {
+                content.append(dbReader.nextLine()).append("\n");
+            }
+            tempStrBuildr = new StringBuilder(content.toString());
+            clearContent();
+        } else {
+            throw new FileNotFoundException();
+        }
+        return tempStrBuildr;
+    }
     public StringBuilder readDatabase(String name) throws IOException {
         File file = new File(name);
         StringBuilder tempStrBuildr;
@@ -78,9 +101,9 @@ class Database {
         }
         return tempStrBuildr;
     }
-    public StringBuilder readDatabase() throws IOException {
+    public StringBuilder readDatabase(File file) throws IOException {
         StringBuilder tempStrBuildr;
-        if (db.exists()) {
+        if (file.exists()) {
             loadScanner();
             while (dbReader.hasNextLine()) {
                 content.append(dbReader.nextLine()).append("\n");
@@ -91,6 +114,22 @@ class Database {
             throw new FileNotFoundException();
         }
         return tempStrBuildr;
+    }
+
+    // Update database method
+    public void updateDatabase(File oldDatabase, File newDatabase) {}
+    public void updateDatabase(String oldDatabase, String newDatabase) {}
+
+    // Delete database method
+    public boolean deleteDatabase() {
+        return db.delete();
+    }
+    public boolean deleteDatabase(String name) {
+        File file = new File(name);
+        return file.delete();
+    }
+    public boolean deleteDatabase(File name) {
+        return name.delete();
     }
 
     /*
