@@ -6,6 +6,15 @@ import java.nio.file.FileAlreadyExistsException;
 import java.util.Scanner;
 
 // CRUD => Create, Read, Update, Delete
+/**
+ *  <p><strong>File structure</strong></p>
+ *  <code>{
+ *      element([propriety=value],[propriety=value])
+ *  }
+ *  </code>
+ *
+ *  @Author Fedi6431
+ */
 @SuppressWarnings("All")
 class Database {
     // Database file variable
@@ -395,4 +404,8 @@ class Database {
         }
     }
 
+    // Create propriety method
+    // Read propriety method
+    // Update (Edit) propriety method
+    // Delete propriety method
 }
