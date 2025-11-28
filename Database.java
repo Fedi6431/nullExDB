@@ -64,6 +64,54 @@ class Database {
         setDatabase(file);
     }
 
+    // Load database methods
+    public void loadDatabase() throws IOException {
+        if (db.exists()) {
+            loadScanner(db);
+            while (dbReader.hasNextLine()) {
+                content.append(dbReader.nextLine()).append("\n");
+            }
+            unloadScanner();
+            loadWriter(db);
+            dbWriter.write(content.toString());
+            unloadWriter();
+            clearContent();
+        } else {
+            throw new FileNotFoundException();
+        }
+    }
+    public void loadDatabase(String name) throws IOException {
+        File file = new File(name);
+        if (file.exists()) {
+            loadScanner(file);
+            while (dbReader.hasNextLine()) {
+                content.append(dbReader.nextLine()).append("\n");
+            }
+            unloadScanner();
+            loadWriter(file);
+            dbWriter.write(content.toString());
+            unloadWriter();
+            clearContent();
+        } else {
+            throw new FileNotFoundException();
+        }
+    }
+    public void loadDatabase(File file) throws IOException {
+        if (file.exists()) {
+            loadScanner(file);
+            while (dbReader.hasNextLine()) {
+                content.append(dbReader.nextLine()).append("\n");
+            }
+            unloadScanner();
+            loadWriter(file);
+            dbWriter.write(content.toString());
+            unloadWriter();
+            clearContent();
+        } else {
+            throw new FileNotFoundException();
+        }
+    }
+
     // Create database method
     public void createDatabase() throws IOException {
         if (db.createNewFile()) {
@@ -347,36 +395,4 @@ class Database {
         }
     }
 
-    // Load database methods
-    public void loadDatabase(String name) throws IOException {
-        File file = new File(name);
-        if (file.exists()) {
-            loadScanner(file);
-            while (dbReader.hasNextLine()) {
-                content.append(dbReader.nextLine()).append("\n");
-            }
-            unloadScanner();
-            loadWriter(file);
-            dbWriter.write(content.toString());
-            unloadWriter();
-            clearContent();
-        } else {
-            throw new FileNotFoundException();
-        }
-    }
-    public void loadDatabase() throws IOException {
-        if (db.exists()) {
-            loadScanner(db);
-            while (dbReader.hasNextLine()) {
-                content.append(dbReader.nextLine()).append("\n");
-            }
-            unloadScanner();
-            loadWriter(db);
-            dbWriter.write(content.toString());
-            unloadWriter();
-            clearContent();
-        } else {
-            throw new FileNotFoundException();
-        }
-    }
 }
