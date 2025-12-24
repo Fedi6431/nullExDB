@@ -6,6 +6,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.util.Scanner;
 
 // CRUD => Create, Read, Update, Delete
+
 /**
  *  <p><strong>File structure</strong></p>
  *  <code>{
@@ -250,7 +251,8 @@ class Database {
             int eofIndex = content.indexOf("}");
             content.delete(eofIndex-1,eofIndex+1);
         }
-        content.append("\t\"").append(element).append("\"").append("\n}");
+
+        content.append("\t").append(element).append("\n}");
         loadWriter(db);
         dbWriter.write(content.toString());
         unloadWriter();
@@ -268,7 +270,7 @@ class Database {
             int eofIndex = content.indexOf("}");
             content.delete(eofIndex-1,eofIndex+1);
         }
-        content.append("\t\"").append(element).append("\"").append("\n}");
+        content.append("\t").append(element).append("\n}");
         loadWriter(file1);
         dbWriter.write(content.toString());
         unloadWriter();
@@ -285,7 +287,7 @@ class Database {
             int eofIndex = content.indexOf("}");
             content.delete(eofIndex-1,eofIndex+1);
         }
-        content.append("\t\"").append(element).append("\"").append("\n}");
+        content.append("\t").append(element).append("\n}");
         loadWriter(file);
         dbWriter.write(content.toString());
         unloadWriter();
@@ -294,7 +296,6 @@ class Database {
     // Read element method
     public String getElement(String element) throws IOException {
         StringBuilder content = readDatabase(db);
-        int elementIndex;
         if (content.indexOf(element) == content.lastIndexOf(element)) {
             return element;
         } else { return null; }
@@ -302,17 +303,95 @@ class Database {
     public String getElement(String file,String element) throws IOException {
         File file1 = new File(file);
         StringBuilder content = readDatabase(file1);
-        int elementIndex;
         if (content.indexOf(element) == content.lastIndexOf(element)) {
             return element;
         } else { return null; }
     }
     public String getElement(File file, String element) throws IOException {
         StringBuilder content = readDatabase(file);
-        int elementIndex;
         if (content.indexOf(element) == content.lastIndexOf(element)) {
             return element;
         } else { return null; }
+    }
+
+    // Returns -11 when there are more elements with that names
+    // Returns -1 when there is no element with that name
+    public int getElementIndex(String element) throws IOException {
+        StringBuilder content = readDatabase(db);
+        if (getElement(element) == element) {
+            if (content.indexOf(element) == content.lastIndexOf(element)) {
+                return content.indexOf(element);
+            } else {
+                return -11;
+            }
+        } else {
+            return -1;
+        }
+    }
+    public int getElementIndex(String file, String element) throws IOException {
+        File file1 = new File(file);
+        StringBuilder content = readDatabase(file1);
+        if (getElement(element) == element) {
+            if (content.indexOf(element) == content.lastIndexOf(element)) {
+                return content.indexOf(element);
+            } else {
+                return -11;
+            }
+        } else {
+            return -1;
+        }
+    }
+    public int getElementIndex(File file, String element) throws IOException {
+        StringBuilder content = readDatabase(file);
+        if (getElement(element) == element) {
+            if (content.indexOf(element) == content.lastIndexOf(element)) {
+                return content.indexOf(element);
+            } else {
+                return -11;
+            }
+        } else {
+            return -1;
+        }
+    }
+
+    // Returns -11 when there are more elements with that names
+    // Returns -1 when there is no element with that name
+    public int getEndElementIndex(String element) throws IOException {
+        StringBuilder content = readDatabase(db);
+        if (getElement(element) == element) {
+            if (content.indexOf(element) == content.lastIndexOf(element)) {
+                return content.indexOf(element)+element.length();
+            } else {
+                return -11;
+            }
+        } else {
+            return -1;
+        }
+    }
+    public int getEndElementIndex(String file, String element) throws IOException {
+        File file1 = new File(file);
+        StringBuilder content = readDatabase(file1);
+        if (getElement(element) == element) {
+            if (content.indexOf(element) == content.lastIndexOf(element)) {
+                return content.indexOf(element)+element.length();
+            } else {
+                return -11;
+            }
+        } else {
+            return -1;
+        }
+    }
+    public int getEndElementIndex(File file, String element) throws IOException {
+        StringBuilder content = readDatabase(file);
+        if (getElement(element) == element) {
+            if (content.indexOf(element) == content.lastIndexOf(element)) {
+                return content.indexOf(element)+element.length();
+            } else {
+                return -11;
+            }
+        } else {
+            return -1;
+        }
     }
 
     // Update (Edit) element method
@@ -365,7 +444,7 @@ class Database {
         int elementIndex;
         if (content.indexOf(element) == content.lastIndexOf(element)) {
             elementIndex = content.indexOf(element);
-            content.delete(elementIndex-3,elementIndex+element.length()+1);
+            content.delete(elementIndex-1,elementIndex+element.length()+1);
             loadWriter(db);
             dbWriter.write(content.toString());
             unloadWriter();
@@ -380,7 +459,7 @@ class Database {
         int elementIndex;
         if (content.indexOf(element) == content.lastIndexOf(element)) {
             elementIndex = content.indexOf(element);
-            content.delete(elementIndex-3,elementIndex+element.length()+1);
+            content.delete(elementIndex-1,elementIndex+element.length()+1);
             loadWriter(file1);
             dbWriter.write(content.toString());
             unloadWriter();
@@ -394,7 +473,7 @@ class Database {
         int elementIndex;
         if (content.indexOf(element) == content.lastIndexOf(element)) {
             elementIndex = content.indexOf(element);
-            content.delete(elementIndex-3,elementIndex+element.length()+1);
+            content.delete(elementIndex-1,elementIndex+element.length()+1);
             loadWriter(file);
             dbWriter.write(content.toString());
             unloadWriter();
@@ -405,7 +484,133 @@ class Database {
     }
 
     // Create propriety method
+    // CREATE != ADD - ADD METHOD'LL BE ADDED SOON
+    public boolean createPropriety(String element,String propriety) throws IOException {
+        if (getElement(element) == null) {
+            return false;
+        } else {
+            StringBuilder content = readDatabase(db);
+            int elementFinishIndex = getElementIndex(element) + element.length();
+
+            // ( checker
+
+            if (!(content.toString().substring(elementFinishIndex,elementFinishIndex+1).equals("("))) {
+                content.insert(elementFinishIndex,"(");
+            }
+            String proprietyStr = "["+propriety+"=null]";
+            content.insert(elementFinishIndex+1,proprietyStr);
+
+            if (!(content.toString().substring(elementFinishIndex+1+proprietyStr.length(),elementFinishIndex+1+proprietyStr.length()+1).equals(")"))) {
+                content.insert(elementFinishIndex+proprietyStr.length()+1,")");
+            }
+            loadWriter(db);
+            dbWriter.append(content);
+            unloadWriter();
+            return true;
+        }
+    }
+    public boolean createPropriety(File file, String element,String propriety) throws IOException {
+        if (getElement(element) == null) {
+            return false;
+        } else {
+            StringBuilder content = readDatabase(file);
+            int elementFinishIndex = getElementIndex(element) + element.length();
+
+            // ( checker
+
+            if (!(content.toString().substring(elementFinishIndex,elementFinishIndex+1).equals("("))) {
+                content.insert(elementFinishIndex,"(");
+            }
+            String proprietyStr = "["+propriety+"=null]";
+            content.insert(elementFinishIndex+1,proprietyStr);
+
+            if (!(content.toString().substring(elementFinishIndex+1+proprietyStr.length(),elementFinishIndex+1+proprietyStr.length()+1).equals(")"))) {
+                content.insert(elementFinishIndex+proprietyStr.length()+1,")");
+            }
+            loadWriter(file);
+            dbWriter.append(content);
+            unloadWriter();
+            return true;
+        }
+    }
+
+    public boolean createPropriety(String element,String propriety,String value) throws IOException {
+        if (getElement(element) == null) {
+            return false;
+        } else {
+            StringBuilder content = readDatabase(db);
+            int elementFinishIndex = getElementIndex(element) + element.length();
+
+            // ( checker
+
+            if (!(content.toString().substring(elementFinishIndex,elementFinishIndex+1).equals("("))) {
+                content.insert(elementFinishIndex,"(");
+            }
+            String proprietyStr = "["+propriety+"="+value+"]";
+            content.insert(elementFinishIndex+1,proprietyStr);
+
+            if (!(content.toString().substring(elementFinishIndex+1+proprietyStr.length(),elementFinishIndex+1+proprietyStr.length()+1).equals(")"))) {
+                content.insert(elementFinishIndex+proprietyStr.length()+1,")");
+            }
+            loadWriter(db);
+            dbWriter.append(content);
+            unloadWriter();
+            return true;
+        }
+    }
+    public boolean createPropriety(String file,String element,String propriety,String value) throws IOException {
+        if (getElement(element) == null) {
+            return false;
+        } else {
+            File file1 = new File(file);
+            StringBuilder content = readDatabase(file1);
+            int elementFinishIndex = getElementIndex(element) + element.length();
+
+            // ( checker
+
+            if (!(content.toString().substring(elementFinishIndex,elementFinishIndex+1).equals("("))) {
+                content.insert(elementFinishIndex,"(");
+            }
+            String proprietyStr = "["+propriety+"=null]";
+            content.insert(elementFinishIndex+1,proprietyStr);
+
+            if (!(content.toString().substring(elementFinishIndex+1+proprietyStr.length(),elementFinishIndex+1+proprietyStr.length()+1).equals(")"))) {
+                content.insert(elementFinishIndex+proprietyStr.length()+1,")");
+            }
+            loadWriter(file1);
+            dbWriter.append(content);
+            unloadWriter();
+            return true;
+        }
+    }
+    public boolean createPropriety(File file, String element,String propriety,String value) throws IOException {
+        if (getElement(element) == null) {
+            return false;
+        } else {
+            StringBuilder content = readDatabase(file);
+            int elementFinishIndex = getElementIndex(element) + element.length();
+
+            // ( checker
+
+            if (!(content.toString().substring(elementFinishIndex,elementFinishIndex+1).equals("("))) {
+                content.insert(elementFinishIndex,"(");
+            }
+            String proprietyStr = "["+propriety+"=null]";
+            content.insert(elementFinishIndex+1,proprietyStr);
+
+            if (!(content.toString().substring(elementFinishIndex+1+proprietyStr.length(),elementFinishIndex+1+proprietyStr.length()+1).equals(")"))) {
+                content.insert(elementFinishIndex+proprietyStr.length()+1,")");
+            }
+            loadWriter(file);
+            dbWriter.append(content);
+            unloadWriter();
+            return true;
+        }
+    }
+
     // Read propriety method
+
+
     // Update (Edit) propriety method
     // Delete propriety method
 }
