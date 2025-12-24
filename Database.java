@@ -485,6 +485,7 @@ class Database {
 
     // Create propriety method
     // CREATE != ADD - ADD METHOD'LL BE ADDED SOON
+    // TODO: multi proprieties
     public boolean createPropriety(String element,String propriety) throws IOException {
         if (getElement(element) == null) {
             return false;
@@ -493,7 +494,6 @@ class Database {
             int elementFinishIndex = getElementIndex(element) + element.length();
 
             // ( checker
-
             if (!(content.toString().substring(elementFinishIndex,elementFinishIndex+1).equals("("))) {
                 content.insert(elementFinishIndex,"(");
             }
@@ -509,7 +509,7 @@ class Database {
             return true;
         }
     }
-    public boolean createPropriety(File file, String element,String propriety) throws IOException {
+    public boolean addPropriety(File file, String element,String propriety) throws IOException {
         if (getElement(element) == null) {
             return false;
         } else {
@@ -534,7 +534,7 @@ class Database {
         }
     }
 
-    public boolean createPropriety(String element,String propriety,String value) throws IOException {
+    public boolean addPropriety(String element,String propriety,String value) throws IOException {
         if (getElement(element) == null) {
             return false;
         } else {
@@ -558,7 +558,7 @@ class Database {
             return true;
         }
     }
-    public boolean createPropriety(String file,String element,String propriety,String value) throws IOException {
+    public boolean addPropriety(String file,String element,String propriety,String value) throws IOException {
         if (getElement(element) == null) {
             return false;
         } else {
@@ -583,7 +583,7 @@ class Database {
             return true;
         }
     }
-    public boolean createPropriety(File file, String element,String propriety,String value) throws IOException {
+    public boolean addPropriety(File file, String element,String propriety,String value) throws IOException {
         if (getElement(element) == null) {
             return false;
         } else {
@@ -609,8 +609,67 @@ class Database {
     }
 
     // Read propriety method
+    public String[] getPropreity(String element) throws IOException{
+        if (getElement(element)==null) {
+            return null;
+        } else {
+            StringBuilder content = readDatabase(db);
+            int elementFinishIndex = getElementIndex(element) + element.length();
 
+            // ( checker
+            if (!(content.toString().substring(elementFinishIndex,elementFinishIndex+1).equals("("))) {
+                return null;
+            } else {
+                String prop = content.toString().substring(elementFinishIndex+1,content.indexOf("]"));
+                prop = prop.substring(1);
+                prop.replace("]","");
+                String[] arr = prop.split("=");
+                return arr;
+            }
+        }
+    }
+    public String[] getPropreity(String file, String element) throws IOException{
+        if (getElement(element)==null) {
+            return null;
+        } else {
+            File file1 = new File(file);
+            StringBuilder content = readDatabase(file1);
+            int elementFinishIndex = getElementIndex(element) + element.length();
+
+            // ( checker
+            if (!(content.toString().substring(elementFinishIndex,elementFinishIndex+1).equals("("))) {
+                return null;
+            } else {
+                String prop = content.toString().substring(elementFinishIndex+1,content.indexOf("]"));
+                prop = prop.substring(1);
+                prop.replace("]","");
+                String[] arr = prop.split("=");
+                return arr;
+            }
+        }
+    }
+    public String[] getPropreity(File file, String element) throws IOException{
+        if (getElement(element)==null) {
+            return null;
+        } else {
+            StringBuilder content = readDatabase(file);
+            int elementFinishIndex = getElementIndex(element) + element.length();
+
+            // ( checker
+            if (!(content.toString().substring(elementFinishIndex,elementFinishIndex+1).equals("("))) {
+                return null;
+            } else {
+                String prop = content.toString().substring(elementFinishIndex+1,content.indexOf("]"));
+                prop = prop.substring(1);
+                prop.replace("]","");
+                String[] arr = prop.split("=");
+                return arr;
+            }
+        }
+    }
 
     // Update (Edit) propriety method
     // Delete propriety method
 }
+
+// Because i don't wanna add multi proprieties (but i'll do it soon) for now 1 element can handle only one propriety
